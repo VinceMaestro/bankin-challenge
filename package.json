@@ -1,0 +1,28 @@
+{
+  "name": "bankin-challenge",
+  "version": "1.0.0",
+  "description": "Bankin Accounts and Transactions Aggregator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VinceMaestro/bankin-challenge.git"
+  },
+  "author": "Vincent Petit <vincent.petit.danjou@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VinceMaestro/bankin-challenge/issues"
+  },
+  "homepage": "https://github.com/VinceMaestro/bankin-challenge#readme",
+  "devDependencies": {
+    "eslint": "^7.9.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0"
+  },
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "superagent": "^6.1.0"
+  }
+}
