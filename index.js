@@ -1,5 +1,3 @@
-require('./challenge-backend-connectors/server/server');
-
 const dotenv = require('dotenv');
 const superagent = require('superagent');
 
