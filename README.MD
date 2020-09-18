@@ -5,6 +5,9 @@ This is a program design to aggregate every transactions linked to every existin
 ## Installing
 
 ```
+clone the server repository (https://github.com/bankin-engineering/challenge-backend-connectors)
+launch the server
+
 npm install
 node index.js
 ```
