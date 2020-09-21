@@ -11,13 +11,13 @@ function getRefreshToken() {
   return superagent.post(`${endpoint}/login`)
     .send({ user: process.env.USER_LOGIN, password: process.env.USER_PASSWORD })
     .set('authorization', basicCredentials)
-    .then((res) => res.body.refreshToken);
+    .then((res) => res.body.refresh_token);
 }
 
 function getAccessToken(refreshToken) {
   return superagent.post(`${endpoint}/token`)
-    .send({ grant_type: 'refresh_token', refreshToken })
-    .then((res) => res.body.accessToken);
+    .send({ grant_type: 'refresh_token', refresh_token: refreshToken })
+    .then((res) => res.body.access_token);
 }
 
 function getPage(accessToken, pageLink) {
@@ -26,16 +26,40 @@ function getPage(accessToken, pageLink) {
     .then((res) => res.body);
 }
 
-async function aggregatePages(pageName, accessToken, currPageLink, previousPagesAggregate = []) {
+function filterDuplicateEntries(pageName, currPage, idMapAndPagesAggregate) {
+  const uniqueKey = pageName === 'account' ? 'acc_number' : 'id';
+
+  const uniqueEntriesIdMap = {};
+  const uniqueEntries = currPage[pageName].filter((entry) => {
+    const isUniqueId = !idMapAndPagesAggregate.idMap[entry[uniqueKey]];
+    if (isUniqueId) {
+      uniqueEntriesIdMap[entry[uniqueKey]] = true;
+
+      return true;
+    }
+    return false;
+  });
+  return { pagesAggregate: uniqueEntries, idMap: uniqueEntriesIdMap };
+}
+
+async function aggregatePages(
+  pageName, accessToken, currPageLink, idMapAndPagesAggregate = { pagesAggregate: [], idMap: {} },
+) {
   const currPage = await getPage(accessToken, currPageLink);
 
   const nextPageLink = currPage.link.next;
-  const pagesAggregate = previousPagesAggregate.concat(currPage[pageName]);
+  const newEntries = filterDuplicateEntries(pageName, currPage, idMapAndPagesAggregate);
+
+  const updatedIdMapAndPagesAggregate = {
+    pagesAggregate: idMapAndPagesAggregate.pagesAggregate.concat(newEntries.pagesAggregate),
+    idMap: { ...idMapAndPagesAggregate.idMap, ...newEntries.idMap },
+  };
 
   if (nextPageLink) {
-    return aggregatePages(pageName, accessToken, nextPageLink, pagesAggregate);
+    return aggregatePages(pageName, accessToken, nextPageLink, updatedIdMapAndPagesAggregate);
   }
-  return pagesAggregate;
+
+  return updatedIdMapAndPagesAggregate.pagesAggregate;
 }
 
 async function getAccounts(accessToken) {
